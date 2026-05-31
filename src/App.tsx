@@ -17,66 +17,73 @@ import {
   LogOut
 } from 'lucide-react';
 import { categories, quotes, Category, people, Person } from './constants';
-import { auth } from './lib/firebase';
+import { auth, db } from './lib/firebase';
 import { GoogleAuthProvider, signInWithPopup, signOut, User } from 'firebase/auth';
+import { collection, getDocs, addDoc } from 'firebase/firestore';
+import { useLanguage } from './contexts/LanguageContext';
 
-const Hero = () => (
-  <section className="relative min-h-screen flex flex-col items-center justify-center text-center px-6 pt-20 overflow-hidden">
-    <div className="absolute inset-0 -z-20">
-      <img 
-        src="https://upload.wikimedia.org/wikipedia/commons/b/b2/Adolph_Tidemand_%26_Hans_Gude_-_Bridal_Procession_on_the_Hardangerfjord_-_Google_Art_Project.jpg" 
-        alt="Brudeferden i Hardanger" 
-        className="w-full h-full object-cover"
-        referrerPolicy="no-referrer"
-      />
-    </div>
-    <div className="absolute inset-0 -z-10 bg-nordic-snow/20 backdrop-blur-[1px]"></div>
-    
-    {/* Liquid Blobs */}
-    <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-[var(--blob-1)] rounded-full blur-3xl animate-blob -z-10 transition-colors duration-1000"></div>
-    <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[var(--blob-2)] rounded-full blur-3xl animate-blob animation-delay-2000 -z-10 transition-colors duration-1000"></div>
-    
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8 }}
-      className="max-w-4xl text-white relative"
-    >
-      <div className="absolute -inset-10 bg-white/5 backdrop-blur-md rounded-[4rem] -z-10 border border-white/10"></div>
-      <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif mb-6 leading-tight drop-shadow-2xl">
-        Norsk Kulturkanon
-      </h1>
-      <p className="text-xl md:text-2xl text-nordic-stone font-light mb-10 max-w-2xl mx-auto leading-relaxed drop-shadow-md">
-        Ei open og levande utforsking av det som har forma norsk kultur, identitet og arv gjennom generasjonar.
-      </p>
-      <div className="flex flex-col sm:flex-row gap-4 justify-center">
-        <a 
-          href="#kategorier" 
-          className="bg-white/90 backdrop-blur-md text-nordic-forest px-8 py-4 rounded-full font-medium flex items-center justify-center gap-2 hover:bg-white transition-all shadow-lg hover:shadow-xl"
-        >
-          Utforsk kulturkanonen <ChevronRight size={20} />
-        </a>
-        <a 
-          href="#om" 
-          className="bg-white/10 text-white border border-white/40 backdrop-blur-md px-8 py-4 rounded-full font-medium hover:bg-white/20 transition-all"
-        >
-          Lær om prosjektet
-        </a>
+const Hero = () => {
+  const { t } = useLanguage();
+  return (
+    <section className="relative min-h-screen flex flex-col items-center justify-center text-center px-6 pt-20 overflow-hidden">
+      <div className="absolute inset-0 -z-20">
+        <img 
+          src="https://upload.wikimedia.org/wikipedia/commons/b/b2/Adolph_Tidemand_%26_Hans_Gude_-_Bridal_Procession_on_the_Hardangerfjord_-_Google_Art_Project.jpg" 
+          alt="Brudeferden i Hardanger" 
+          className="w-full h-full object-cover"
+          referrerPolicy="no-referrer"
+        />
       </div>
-    </motion.div>
-    
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 0.7 }}
-      transition={{ delay: 1, duration: 2 }}
-      className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce"
-    >
-      <div className="w-px h-12 bg-white"></div>
-    </motion.div>
-  </section>
-);
+      <div className="absolute inset-0 -z-10 bg-nordic-snow/20 backdrop-blur-[1px]"></div>
+      
+      {/* Liquid Blobs */}
+      <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-[var(--blob-1)] rounded-full blur-3xl animate-blob -z-10 transition-colors duration-1000"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[var(--blob-2)] rounded-full blur-3xl animate-blob animation-delay-2000 -z-10 transition-colors duration-1000"></div>
+      
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="max-w-4xl text-white relative"
+      >
+        <div className="absolute -inset-10 bg-white/5 backdrop-blur-md rounded-[4rem] -z-10 border border-white/10"></div>
+        <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif mb-6 leading-tight drop-shadow-2xl">
+          {t('hero.title')}
+        </h1>
+        <p className="text-xl md:text-2xl text-nordic-stone font-light mb-10 max-w-2xl mx-auto leading-relaxed drop-shadow-md">
+          {t('hero.subtitle')}
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <a 
+            href="#kategorier" 
+            className="bg-white/90 backdrop-blur-md text-nordic-forest px-8 py-4 rounded-full font-medium flex items-center justify-center gap-2 hover:bg-white transition-all shadow-lg hover:shadow-xl"
+          >
+            {t('hero.explore')} <ChevronRight size={20} />
+          </a>
+          <a 
+            href="#om" 
+            className="bg-white/10 text-white border border-white/40 backdrop-blur-md px-8 py-4 rounded-full font-medium hover:bg-white/20 transition-all"
+          >
+            {t('hero.about')}
+          </a>
+        </div>
+      </motion.div>
+      
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.7 }}
+        transition={{ delay: 1, duration: 2 }}
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce"
+      >
+        <div className="w-px h-12 bg-white"></div>
+      </motion.div>
+    </section>
+  );
+};
 
-const About = () => (
+const About = () => {
+  const { t } = useLanguage();
+  return (
   <section id="om" className="section-spacing bg-nordic-snow relative overflow-hidden transition-colors duration-1000">
     <div className="absolute top-0 right-0 w-96 h-96 bg-blue-100/50 rounded-full blur-3xl animate-blob -z-10"></div>
     <div className="absolute bottom-0 left-0 w-96 h-96 bg-emerald-100/50 rounded-full blur-3xl animate-blob animation-delay-4000 -z-10"></div>
@@ -85,15 +92,15 @@ const About = () => (
       <div className="liquid-glass p-10 rounded-[3rem]">
         <div className="flex items-center gap-2 text-nordic-stone mb-4">
           <Info size={18} />
-          <span className="text-sm font-medium uppercase tracking-widest">Om prosjektet</span>
+          <span className="text-sm font-medium uppercase tracking-widest">{t('about.label')}</span>
         </div>
-        <h2 className="text-4xl md:text-5xl mb-8 leading-tight">Kvifor ein norsk kulturkanon?</h2>
+        <h2 className="text-4xl md:text-5xl mb-8 leading-tight">{t('about.title')}</h2>
         <div className="space-y-6 text-lg text-nordic-stone leading-relaxed">
           <p>
-            Ein kulturkanon er ikkje ei lukka liste over kva som er "best", men eit utgangspunkt for samtale om kven vi er og kvar vi kjem frå.
+            {t('about.p1')}
           </p>
           <p>
-            Gjennom dette prosjektet ønskjer vi å løfte fram sentrale verk, kunstnarar og fenomen som har prega det norske samfunnet. Vi ser på både den klassiske arven og dei moderne uttrykka som formar oss i dag.
+            {t('about.p2')}
           </p>
         </div>
       </div>
@@ -108,12 +115,13 @@ const About = () => (
         </div>
         <div className="absolute -bottom-6 -left-6 liquid-glass p-8 rounded-3xl max-w-xs hidden lg:block">
           <Quote className="text-nordic-stone mb-4 opacity-20" size={40} />
-          <p className="italic text-nordic-slate mb-2">"Kultur er det som gjer at vi forstår kvarandre utan å bruke ord."</p>
+          <p className="italic text-nordic-slate mb-2">{t('about.quote')}</p>
         </div>
       </div>
     </div>
   </section>
-);
+  );
+};
 
 const CategoryCard = ({ category, onClick }: { category: Category, onClick: () => void, key?: string | number }) => {
   const Icon = category.icon;
@@ -138,6 +146,7 @@ const CategoryCard = ({ category, onClick }: { category: Category, onClick: () =
 
 const Categories = () => {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const { t } = useLanguage();
 
   return (
     <section id="kategorier" className="section-spacing bg-nordic-snow relative overflow-hidden">
@@ -145,9 +154,9 @@ const Categories = () => {
       
       <div className="max-w-7xl mx-auto relative">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl mb-4">Hovudkategoriar</h2>
+          <h2 className="text-4xl md:text-5xl mb-4">{t('categories.title')}</h2>
           <p className="text-nordic-stone max-w-2xl mx-auto text-lg">
-            Utforsk dei ulike felta som utgjer ryggraden i den norske kulturarven.
+            {t('categories.subtitle')}
           </p>
         </div>
 
@@ -230,6 +239,7 @@ const Categories = () => {
 const InteractiveSection = () => {
   const [suggestion, setSuggestion] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const { t } = useLanguage();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -248,9 +258,9 @@ const InteractiveSection = () => {
       
       <div className="max-w-4xl mx-auto liquid-glass p-16 rounded-[4rem] text-center relative">
         <Sparkles className="mx-auto mb-6 text-nordic-stone" size={40} />
-        <h2 className="text-4xl mb-6">Kva manglar i kanonen?</h2>
+        <h2 className="text-4xl mb-6">{t('interactive.title')}</h2>
         <p className="text-lg text-nordic-stone mb-10">
-          Ein kulturkanon er aldri ferdig. Vi inviterer deg til å foreslå verk, personar eller fenomen som du meiner bør vere ein del av vår felles arv.
+          {t('interactive.subtitle')}
         </p>
         
         <form onSubmit={handleSubmit} className="relative max-w-lg mx-auto">
@@ -286,15 +296,18 @@ const InteractiveSection = () => {
   );
 };
 
-const Reflection = () => (
-  <section id="refleksjon" className="section-spacing bg-nordic-forest relative overflow-hidden">
-    <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent -z-10"></div>
-    
-    <div className="max-w-4xl mx-auto text-center relative">
-      <MessageSquare className="mx-auto mb-8 opacity-30" size={48} color="white" />
-      <h2 className="text-4xl md:text-5xl mb-12 text-white">Kva bør ein kulturkanon vere?</h2>
+const Reflection = () => {
+  const { t } = useLanguage();
+  return (
+    <section id="refleksjon" className="section-spacing bg-nordic-forest relative overflow-hidden">
+      <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent -z-10"></div>
       
-      <div className="grid md:grid-cols-2 gap-8 text-left">
+      <div className="max-w-4xl mx-auto text-center relative">
+        <MessageSquare className="mx-auto mb-8 opacity-30" size={48} color="white" />
+        <h2 className="text-4xl md:text-5xl mb-12 text-white">{t('reflection.title')}</h2>
+        <p className="text-lg text-white/80 mb-12 max-w-2xl mx-auto">{t('reflection.p1')}</p>
+        
+        <div className="grid md:grid-cols-2 gap-8 text-left">
         {[
           {
             title: "Kven blir inkludert?",
@@ -323,7 +336,8 @@ const Reflection = () => (
       </div>
     </div>
   </section>
-);
+  );
+};
 
 const QuoteSection = () => {
   const [currentQuote, setCurrentQuote] = useState(0);
@@ -361,7 +375,9 @@ const QuoteSection = () => {
   );
 };
 
-const Footer = () => (
+const Footer = () => {
+  const { t } = useLanguage();
+  return (
   <footer className="bg-nordic-snow border-t border-nordic-mist pt-20 pb-10 px-6 md:px-12 transition-colors duration-1000">
     <div className="max-w-7xl mx-auto">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
@@ -371,23 +387,23 @@ const Footer = () => (
             <span className="font-serif text-2xl font-bold tracking-tight">Norsk Kulturkanon</span>
           </div>
           <p className="text-nordic-stone text-lg max-w-md leading-relaxed">
-            Eit uavhengig prosjekt for å fremje samtale om norsk kultur, historie og identitet. Vi trur på ein open og inkluderande kulturarv.
+            {t('footer.description')}
           </p>
         </div>
         <div>
-          <h4 className="font-bold mb-6 uppercase tracking-widest text-sm">Navigasjon</h4>
+          <h4 className="font-bold mb-6 uppercase tracking-widest text-sm">{t('footer.links')}</h4>
           <ul className="space-y-4 text-nordic-stone">
-            <li><Link to="/" className="hover:text-nordic-slate transition-colors">Heim</Link></li>
-            <li><a href="#om" className="hover:text-nordic-slate transition-colors">Om prosjektet</a></li>
-            <li><a href="#kategorier" className="hover:text-nordic-slate transition-colors">Kategorier</a></li>
-            <li><a href="#refleksjon" className="hover:text-nordic-slate transition-colors">Refleksjon</a></li>
+            <li><Link to="/" className="hover:text-nordic-slate transition-colors">{t('footer.home')}</Link></li>
+            <li><a href="#om" className="hover:text-nordic-slate transition-colors">{t('nav.about')}</a></li>
+            <li><a href="#kategorier" className="hover:text-nordic-slate transition-colors">{t('nav.categories')}</a></li>
+            <li><a href="#refleksjon" className="hover:text-nordic-slate transition-colors">{t('nav.reflection')}</a></li>
           </ul>
         </div>
         <div>
-          <h4 className="font-bold mb-6 uppercase tracking-widest text-sm">Kontakt</h4>
+          <h4 className="font-bold mb-6 uppercase tracking-widest text-sm">{t('footer.contact')}</h4>
           <ul className="space-y-4 text-nordic-stone">
             <li>post@kulturkanon.no</li>
-            <li>Oslo, Noreg</li>
+            <li>Oslo, Norge</li>
             <li className="pt-4 flex gap-4">
               <div className="w-10 h-10 rounded-full bg-nordic-mist flex items-center justify-center hover:bg-nordic-forest hover:text-white transition-all cursor-pointer">
                 <Globe size={18} />
@@ -400,19 +416,20 @@ const Footer = () => (
         </div>
       </div>
       <div className="border-t border-nordic-mist pt-8 flex flex-col md:row justify-between items-center gap-4 text-nordic-stone text-sm">
-        <p>© 2026 Norsk Kulturkanon. Alle rettar reservert.</p>
+        <p>© 2026 Norsk Kulturkanon. {t('footer.rights')}</p>
         <div className="flex gap-8">
           <a href="#" className="hover:text-nordic-slate">Personvern</a>
-          <a href="#" className="hover:text-nordic-slate">Vilkår</a>
         </div>
       </div>
     </div>
   </footer>
-);
+  );
+};
 
 const Navbar = () => {
   const location = useLocation();
   const [user, setUser] = useState<User | null>(null);
+  const { language, setLanguage, t } = useLanguage();
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(setUser);
@@ -442,14 +459,30 @@ const Navbar = () => {
         <span className="font-serif text-lg md:text-xl font-bold tracking-tight text-nordic-slate hidden sm:block">Kulturkanon</span>
       </Link>
       <div className="hidden lg:flex gap-8 text-sm font-medium uppercase tracking-widest text-nordic-slate items-center">
-        <a href="#om" className="hover:text-nordic-stone transition-colors">Om</a>
-        <a href="#kategorier" className="hover:text-nordic-stone transition-colors">Kategorier</a>
-        <Link to="/galleri" className="hover:text-nordic-stone transition-colors">Galleri</Link>
-        <a href="#refleksjon" className="hover:text-nordic-stone transition-colors">Refleksjon</a>
+        <a href="#om" className="hover:text-nordic-stone transition-colors">{t('nav.about')}</a>
+        <a href="#kategorier" className="hover:text-nordic-stone transition-colors">{t('nav.categories')}</a>
+        <Link to="/galleri" className="hover:text-nordic-stone transition-colors">{t('nav.gallery')}</Link>
+        <a href="#refleksjon" className="hover:text-nordic-stone transition-colors">{t('nav.reflection')}</a>
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 md:gap-4">
+        {/* Language Toggle */}
+        <div className="flex bg-white/50 backdrop-blur-md rounded-full shadow-sm overflow-hidden p-1 border border-white/20">
+          <button 
+            onClick={() => setLanguage('nn')} 
+            className={`text-xs font-bold px-3 py-1 pb-[0.2rem] rounded-full transition-all ${language === 'nn' ? 'bg-nordic-forest text-white' : 'text-nordic-stone hover:text-nordic-slate'}`}
+          >
+            NN
+          </button>
+          <button 
+            onClick={() => setLanguage('nb')} 
+            className={`text-xs font-bold px-3 py-1 pb-[0.2rem] rounded-full transition-all ${language === 'nb' ? 'bg-nordic-forest text-white' : 'text-nordic-stone hover:text-nordic-slate'}`}
+          >
+            NB
+          </button>
+        </div>
+
         {user ? (
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 ml-2">
             <span className="text-xs font-semibold text-nordic-stone hidden sm:block">{user.displayName}</span>
             <div className="w-8 h-8 rounded-full bg-nordic-mist flex items-center justify-center overflow-hidden border border-white/20 shadow-sm relative group cursor-pointer" onClick={handleLogout}>
               {user.photoURL ? (
@@ -463,8 +496,8 @@ const Navbar = () => {
             </div>
           </div>
         ) : (
-          <button onClick={handleLogin} className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/50 hover:bg-white/80 border border-white/40 shadow-sm text-xs font-semibold uppercase tracking-widest text-nordic-slate transition-all">
-            <UserIcon size={14} /> Logg inn
+          <button onClick={handleLogin} className="flex items-center gap-2 px-3 py-2 md:px-4 md:py-2 ml-2 rounded-full bg-white/50 hover:bg-white/80 border border-white/40 shadow-sm text-xs font-semibold uppercase tracking-widest text-nordic-slate transition-all whitespace-nowrap">
+            <UserIcon size={14} className="hidden sm:block" /> {t('nav.login')}
           </button>
         )}
       </div>
@@ -473,11 +506,47 @@ const Navbar = () => {
 };
 
 const GalleryPage = () => {
+  const { t } = useLanguage();
+  const [firebasePeople, setFirebasePeople] = useState<Person[]>([]);
+  const [user, setUser] = useState<User | null>(null);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newPerson, setNewPerson] = useState({ name: '', role: '', period: '', description: '', image: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   useEffect(() => {
     window.scrollTo(0, 0);
+    const unsubscribe = auth.onAuthStateChanged(setUser);
+    fetchPeople();
+    return () => unsubscribe();
   }, []);
 
+  const fetchPeople = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, 'people'));
+      const fetched = querySnapshot.docs.map(doc => doc.data() as Person);
+      setFirebasePeople(fetched);
+    } catch (e) {
+      console.error("Error fetching people", e);
+    }
+  };
+
+  const handleAddPerson = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPerson.name || !newPerson.role) return;
+    setIsSubmitting(true);
+    try {
+      await addDoc(collection(db, 'people'), newPerson);
+      setNewPerson({ name: '', role: '', period: '', description: '', image: '' });
+      setShowAddForm(false);
+      fetchPeople();
+    } catch (e) {
+      console.error("Error adding person", e);
+    }
+    setIsSubmitting(false);
+  };
+
   const frameStyles = ['glass-frame', 'glass-frame-dark', 'glass-frame-accent'];
+  const allPeople = [...people, ...firebasePeople];
 
   return (
     <div className="min-h-screen gallery-wall pt-32 pb-24 px-4 md:px-8 lg:px-16 relative overflow-hidden">
@@ -493,18 +562,43 @@ const GalleryPage = () => {
             className="inline-block mb-6"
           >
             <Link to="/" className="flex items-center gap-2 text-nordic-stone hover:text-nordic-slate transition-colors uppercase tracking-widest text-xs font-bold">
-              <ArrowLeft size={14} /> Tilbake til forsida
+              <ArrowLeft size={14} /> {t('gallery.back')}
             </Link>
           </motion.div>
-          <h1 className="text-5xl md:text-7xl text-nordic-slate font-serif mb-6 tracking-tight">Persongalleriet</h1>
+          <h1 className="text-5xl md:text-7xl text-nordic-slate font-serif mb-6 tracking-tight">{t('gallery.title')}</h1>
           <div className="w-24 h-1 bg-nordic-forest/20 mx-auto mb-8"></div>
-          <p className="text-lg md:text-xl text-nordic-stone max-w-2xl mx-auto font-light">
-            Dei som har forma vår felles historie, presentert i eit moderne lys.
+          <p className="text-lg md:text-xl text-nordic-stone max-w-2xl mx-auto font-light mb-8">
+            {t('gallery.subtitle')}
           </p>
+          {user && !showAddForm && (
+            <button 
+              onClick={() => setShowAddForm(true)}
+              className="bg-nordic-forest text-white px-6 py-3 rounded-full text-sm font-semibold uppercase tracking-widest hover:bg-opacity-90 transition-all shadow-md"
+            >
+              <Plus size={16} className="inline mr-2" /> {t('gallery.add_button')}
+            </button>
+          )}
         </header>
 
+        {showAddForm && (
+          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl mx-auto mb-20 bg-white/50 backdrop-blur-md p-8 rounded-[3rem] border border-white/40 shadow-xl">
+            <h3 className="text-2xl font-serif text-nordic-slate mb-6 text-center">{t('gallery.add_title')}</h3>
+            <form onSubmit={handleAddPerson} className="flex flex-col gap-4">
+              <input type="text" placeholder={t('gallery.add_name')} value={newPerson.name} onChange={e => setNewPerson({...newPerson, name: e.target.value})} className="px-6 py-4 rounded-full bg-white/60 border border-white/50 focus:outline-none focus:ring-2 focus:ring-nordic-forest/30" required />
+              <input type="text" placeholder={t('gallery.add_role')} value={newPerson.role} onChange={e => setNewPerson({...newPerson, role: e.target.value})} className="px-6 py-4 rounded-full bg-white/60 border border-white/50 focus:outline-none focus:ring-2 focus:ring-nordic-forest/30" required />
+              <input type="text" placeholder={t('gallery.add_period')} value={newPerson.period} onChange={e => setNewPerson({...newPerson, period: e.target.value})} className="px-6 py-4 rounded-full bg-white/60 border border-white/50 focus:outline-none focus:ring-2 focus:ring-nordic-forest/30" />
+              <input type="text" placeholder={t('gallery.add_image')} value={newPerson.image} onChange={e => setNewPerson({...newPerson, image: e.target.value})} className="px-6 py-4 rounded-full bg-white/60 border border-white/50 focus:outline-none focus:ring-2 focus:ring-nordic-forest/30" />
+              <textarea placeholder="Beskrivelse / Description" value={newPerson.description} onChange={e => setNewPerson({...newPerson, description: e.target.value})} className="px-6 py-4 rounded-3xl bg-white/60 border border-white/50 focus:outline-none focus:ring-2 focus:ring-nordic-forest/30 min-h-[120px]" required />
+              <div className="flex gap-4 justify-end mt-4">
+                <button type="button" onClick={() => setShowAddForm(false)} className="px-6 py-3 rounded-full text-nordic-stone hover:text-nordic-slate font-semibold uppercase tracking-widest text-sm transition-colors">{t('gallery.add_cancel')}</button>
+                <button type="submit" disabled={isSubmitting} className="bg-nordic-forest text-white px-8 py-3 rounded-full text-sm font-semibold uppercase tracking-widest hover:bg-opacity-90 transition-all disabled:opacity-50">{t('gallery.add_submit')}</button>
+              </div>
+            </form>
+          </motion.div>
+        )}
+
         <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-12 space-y-16">
-          {people.map((person, idx) => {
+          {allPeople.map((person, idx) => {
             const frameStyle = frameStyles[idx % frameStyles.length];
 
             return (
@@ -519,7 +613,7 @@ const GalleryPage = () => {
                 <div className={`picture-frame ${frameStyle} group cursor-pointer hover:scale-[1.02] transition-all duration-500`}>
                   <div className="relative overflow-hidden rounded-2xl bg-black/5 backdrop-blur-sm">
                     <img 
-                      src={person.image} 
+                      src={person.image || 'https://images.unsplash.com/photo-1599021200155-24231b6dfa25?w=600&auto=format&fit=crop&q=80'} 
                       alt={person.name} 
                       className="w-full h-auto object-cover transition-all duration-1000 group-hover:scale-110 grayscale-[20%] group-hover:grayscale-0"
                       referrerPolicy="no-referrer"
@@ -547,27 +641,30 @@ const GalleryPage = () => {
   );
 };
 
-const HomePage = () => (
-  <>
-    <Hero />
-    <About />
-    <QuoteSection />
-    <Categories />
-    <InteractiveSection />
-    <Reflection />
-    <section className="section-spacing bg-nordic-snow text-center transition-colors duration-1000">
-      <div className="max-w-3xl mx-auto">
-        <h2 className="text-4xl mb-8">Bli med på samtalen</h2>
-        <p className="text-xl text-nordic-stone mb-10 leading-relaxed">
-          Kulturkanonen er eit levande prosjekt. Vi ønskjer dine refleksjonar og forslag velkomne. Sjå på dette som ein invitasjon til å utforske vår felles arv.
-        </p>
-        <button className="bg-nordic-forest text-white px-10 py-5 rounded-full font-medium text-lg hover:bg-opacity-90 transition-all shadow-xl">
-          Del dine refleksjonar
-        </button>
-      </div>
-    </section>
-  </>
-);
+const HomePage = () => {
+  const { t } = useLanguage();
+  return (
+    <>
+      <Hero />
+      <About />
+      <QuoteSection />
+      <Categories />
+      <InteractiveSection />
+      <Reflection />
+      <section className="section-spacing bg-nordic-snow text-center transition-colors duration-1000">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-4xl mb-8">{t('join.title')}</h2>
+          <p className="text-xl text-nordic-stone mb-10 leading-relaxed">
+            {t('join.subtitle')}
+          </p>
+          <button className="bg-nordic-forest text-white px-10 py-5 rounded-full font-medium text-lg hover:bg-opacity-90 transition-all shadow-xl">
+            {t('join.button')}
+          </button>
+        </div>
+      </section>
+    </>
+  );
+};
 
 const useNorwayTime = () => {
   const [timeOfDay, setTimeOfDay] = useState<'night' | 'dawn' | 'day' | 'dusk' | 'evening'>('day');
