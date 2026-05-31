@@ -101,47 +101,17 @@ export const quotes = [
 ];
 
 export interface Person {
+  id?: string;
   name: string;
   role: string;
+  period?: string;
   description: string;
   image: string;
+  attribution?: {
+    author: string;
+    url: string;
+    license: string;
+  };
 }
 
-export const people: Person[] = [
-  {
-    name: "Henrik Ibsen",
-    role: "Dramatiker",
-    description: "Verdensberømt for sine realistiske samtidsdramaer som 'Et dukkehjem' og 'Peer Gynt'.",
-    image: "https://picsum.photos/seed/ibsen/400/500"
-  },
-  {
-    name: "Edvard Munch",
-    role: "Billedkunstner",
-    description: "Ekspresjonismens far i Norge, mest kjent for 'Skrik' og sine skildringer av menneskesinnets dypeste følelser.",
-    image: "https://picsum.photos/seed/munch/400/500"
-  },
-  {
-    name: "Sigrid Undset",
-    role: "Forfatter",
-    description: "Nobelprisvinner i litteratur, kjent for sine historiske romaner om middelalderen, som 'Kristin Lavransdatter'.",
-    image: "https://picsum.photos/seed/undset/400/500"
-  },
-  {
-    name: "Edvard Grieg",
-    role: "Komponist",
-    description: "Norges fremste komponist som forente norsk folkemusikk med klassisk romantikk.",
-    image: "https://picsum.photos/seed/grieg/400/500"
-  },
-  {
-    name: "Mari Boine",
-    role: "Musiker",
-    description: "En av de viktigste stemmene i moderne samisk musikk, som har brakt joik til et globalt publikum.",
-    image: "https://picsum.photos/seed/boine/400/500"
-  },
-  {
-    name: "Harriet Backer",
-    role: "Maler",
-    description: "En av Norges viktigste kvinnelige malere, kjent for sine interiørstudier og bruk av lys.",
-    image: "https://picsum.photos/seed/backer/400/500"
-  }
-];
+export const people: Person[] = [];

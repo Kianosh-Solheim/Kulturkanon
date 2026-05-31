@@ -71,8 +71,14 @@ const translations: Record<Language, Record<string, string>> = {
     'gallery.add_role': 'Rolle/Tittel',
     'gallery.add_period': 'Periode (f.eks. 1828 - 1906)',
     'gallery.add_image': 'Bilde-URL (valgfritt)',
+    'gallery.search_image': 'Søk på Wikimedia',
+    'gallery.searching': 'Søker...',
+    'gallery.attribution': 'Bilde:',
     'gallery.add_cancel': 'Avbryt',
-    'gallery.add_submit': 'Legg til'
+    'gallery.add_submit': 'Legg til',
+    'gallery.edit_button': 'Rediger',
+    'gallery.edit_title': 'Rediger person',
+    'gallery.edit_submit': 'Lagre endringer'
   },
   nn: {
     // Navbar
@@ -134,8 +140,14 @@ const translations: Record<Language, Record<string, string>> = {
     'gallery.add_role': 'Rolle/Tittel',
     'gallery.add_period': 'Periode (f.eks. 1828 - 1906)',
     'gallery.add_image': 'Bilete-URL (valfritt)',
+    'gallery.search_image': 'Søk på Wikimedia',
+    'gallery.searching': 'Søker...',
+    'gallery.attribution': 'Bilete:',
     'gallery.add_cancel': 'Avbryt',
-    'gallery.add_submit': 'Legg til'
+    'gallery.add_submit': 'Legg til',
+    'gallery.edit_button': 'Rediger',
+    'gallery.edit_title': 'Rediger person',
+    'gallery.edit_submit': 'Lagre endringar'
   }
 };
 

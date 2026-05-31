@@ -19,8 +19,9 @@ import {
 import { categories, quotes, Category, people, Person } from './constants';
 import { auth, db } from './lib/firebase';
 import { GoogleAuthProvider, signInWithPopup, signOut, User } from 'firebase/auth';
-import { collection, getDocs, addDoc } from 'firebase/firestore';
+import { collection, getDocs, addDoc, doc, updateDoc } from 'firebase/firestore';
 import { useLanguage } from './contexts/LanguageContext';
+import { WikimediaImageSearch, WikimediaImage } from './components/WikimediaImageSearch';
 
 const Hero = () => {
   const { t } = useLanguage();
@@ -510,7 +511,8 @@ const GalleryPage = () => {
   const [firebasePeople, setFirebasePeople] = useState<Person[]>([]);
   const [user, setUser] = useState<User | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [newPerson, setNewPerson] = useState({ name: '', role: '', period: '', description: '', image: '' });
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [newPerson, setNewPerson] = useState<Partial<Person>>({ name: '', role: '', period: '', description: '', image: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -523,26 +525,52 @@ const GalleryPage = () => {
   const fetchPeople = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, 'people'));
-      const fetched = querySnapshot.docs.map(doc => doc.data() as Person);
+      const fetched = querySnapshot.docs.map(doc => ({ id: doc.id, ...(doc.data() as Person) }));
       setFirebasePeople(fetched);
     } catch (e) {
       console.error("Error fetching people", e);
     }
   };
 
-  const handleAddPerson = async (e: React.FormEvent) => {
+  const handleSavePerson = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newPerson.name || !newPerson.role) return;
     setIsSubmitting(true);
     try {
-      await addDoc(collection(db, 'people'), newPerson);
+      if (editingId) {
+        const personRef = doc(db, 'people', editingId);
+        await updateDoc(personRef, newPerson);
+      } else {
+        await addDoc(collection(db, 'people'), newPerson);
+      }
       setNewPerson({ name: '', role: '', period: '', description: '', image: '' });
       setShowAddForm(false);
+      setEditingId(null);
       fetchPeople();
     } catch (e) {
-      console.error("Error adding person", e);
+      console.error("Error saving person", e);
     }
     setIsSubmitting(false);
+  };
+
+  const startAddPerson = () => {
+    setNewPerson({ name: '', role: '', period: '', description: '', image: '' });
+    setEditingId(null);
+    setShowAddForm(true);
+  };
+
+  const startEditPerson = (person: Person) => {
+    setNewPerson({
+      name: person.name,
+      role: person.role,
+      period: person.period || '',
+      description: person.description,
+      image: person.image,
+      attribution: person.attribution
+    });
+    setEditingId(person.id!);
+    setShowAddForm(true);
+    window.scrollTo({ top: 300, behavior: 'smooth' });
   };
 
   const frameStyles = ['glass-frame', 'glass-frame-dark', 'glass-frame-accent'];
@@ -572,7 +600,7 @@ const GalleryPage = () => {
           </p>
           {user && !showAddForm && (
             <button 
-              onClick={() => setShowAddForm(true)}
+              onClick={startAddPerson}
               className="bg-nordic-forest text-white px-6 py-3 rounded-full text-sm font-semibold uppercase tracking-widest hover:bg-opacity-90 transition-all shadow-md"
             >
               <Plus size={16} className="inline mr-2" /> {t('gallery.add_button')}
@@ -582,16 +610,38 @@ const GalleryPage = () => {
 
         {showAddForm && (
           <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl mx-auto mb-20 bg-white/50 backdrop-blur-md p-8 rounded-[3rem] border border-white/40 shadow-xl">
-            <h3 className="text-2xl font-serif text-nordic-slate mb-6 text-center">{t('gallery.add_title')}</h3>
-            <form onSubmit={handleAddPerson} className="flex flex-col gap-4">
+            <h3 className="text-2xl font-serif text-nordic-slate mb-6 text-center">{editingId ? t('gallery.edit_title') : t('gallery.add_title')}</h3>
+            <form onSubmit={handleSavePerson} className="flex flex-col gap-4">
               <input type="text" placeholder={t('gallery.add_name')} value={newPerson.name} onChange={e => setNewPerson({...newPerson, name: e.target.value})} className="px-6 py-4 rounded-full bg-white/60 border border-white/50 focus:outline-none focus:ring-2 focus:ring-nordic-forest/30" required />
               <input type="text" placeholder={t('gallery.add_role')} value={newPerson.role} onChange={e => setNewPerson({...newPerson, role: e.target.value})} className="px-6 py-4 rounded-full bg-white/60 border border-white/50 focus:outline-none focus:ring-2 focus:ring-nordic-forest/30" required />
-              <input type="text" placeholder={t('gallery.add_period')} value={newPerson.period} onChange={e => setNewPerson({...newPerson, period: e.target.value})} className="px-6 py-4 rounded-full bg-white/60 border border-white/50 focus:outline-none focus:ring-2 focus:ring-nordic-forest/30" />
-              <input type="text" placeholder={t('gallery.add_image')} value={newPerson.image} onChange={e => setNewPerson({...newPerson, image: e.target.value})} className="px-6 py-4 rounded-full bg-white/60 border border-white/50 focus:outline-none focus:ring-2 focus:ring-nordic-forest/30" />
-              <textarea placeholder="Beskrivelse / Description" value={newPerson.description} onChange={e => setNewPerson({...newPerson, description: e.target.value})} className="px-6 py-4 rounded-3xl bg-white/60 border border-white/50 focus:outline-none focus:ring-2 focus:ring-nordic-forest/30 min-h-[120px]" required />
+              <input type="text" placeholder={t('gallery.add_period')} value={newPerson.period || ''} onChange={e => setNewPerson({...newPerson, period: e.target.value})} className="px-6 py-4 rounded-full bg-white/60 border border-white/50 focus:outline-none focus:ring-2 focus:ring-nordic-forest/30" />
+              
+              <div className="flex flex-col gap-2">
+                <WikimediaImageSearch onSelect={(img) => {
+                  setNewPerson({
+                    ...newPerson,
+                    image: img.url,
+                    attribution: {
+                      author: img.author,
+                      url: img.attributionUrl,
+                      license: img.license
+                    }
+                  });
+                }} />
+                <input type="text" placeholder={t('gallery.add_image')} value={newPerson.image || ''} onChange={e => setNewPerson({...newPerson, image: e.target.value, attribution: undefined})} className="px-6 py-4 rounded-full bg-white/60 border border-white/50 focus:outline-none focus:ring-2 focus:ring-nordic-forest/30" />
+                {newPerson.attribution && (
+                  <p className="text-xs text-nordic-stone px-4 py-1">
+                    {t('gallery.attribution')} Valgt bilde med lisens {newPerson.attribution.license} av {newPerson.attribution.author}
+                  </p>
+                )}
+              </div>
+
+              <textarea placeholder="Beskrivelse / Description" value={newPerson.description || ''} onChange={e => setNewPerson({...newPerson, description: e.target.value})} className="px-6 py-4 rounded-3xl bg-white/60 border border-white/50 focus:outline-none focus:ring-2 focus:ring-nordic-forest/30 min-h-[120px]" required />
               <div className="flex gap-4 justify-end mt-4">
-                <button type="button" onClick={() => setShowAddForm(false)} className="px-6 py-3 rounded-full text-nordic-stone hover:text-nordic-slate font-semibold uppercase tracking-widest text-sm transition-colors">{t('gallery.add_cancel')}</button>
-                <button type="submit" disabled={isSubmitting} className="bg-nordic-forest text-white px-8 py-3 rounded-full text-sm font-semibold uppercase tracking-widest hover:bg-opacity-90 transition-all disabled:opacity-50">{t('gallery.add_submit')}</button>
+                <button type="button" onClick={() => { setShowAddForm(false); setEditingId(null); }} className="px-6 py-3 rounded-full text-nordic-stone hover:text-nordic-slate font-semibold uppercase tracking-widest text-sm transition-colors">{t('gallery.add_cancel')}</button>
+                <button type="submit" disabled={isSubmitting} className="bg-nordic-forest text-white px-8 py-3 rounded-full text-sm font-semibold uppercase tracking-widest hover:bg-opacity-90 transition-all disabled:opacity-50">
+                  {editingId ? t('gallery.edit_submit') : t('gallery.add_submit')}
+                </button>
               </div>
             </form>
           </motion.div>
@@ -631,6 +681,21 @@ const GalleryPage = () => {
                   <p className="text-nordic-stone text-sm leading-relaxed font-serif">
                     {person.description}
                   </p>
+                  {person.attribution && (
+                    <div className="mt-3 text-[10px] text-nordic-stone border-t border-nordic-mist/50 pt-2 inline-block">
+                      Bilde av {person.attribution.author} • <a href={person.attribution.url} target="_blank" rel="noopener noreferrer" className="hover:text-nordic-forest underline underline-offset-2">Wikimedia Commons</a> ({person.attribution.license})
+                    </div>
+                  )}
+                  {user && person.id && (
+                    <div className="mt-4 flex justify-center">
+                      <button 
+                        onClick={() => startEditPerson(person)}
+                        className="text-xs text-nordic-stone hover:text-nordic-forest border border-nordic-mist hover:border-nordic-forest px-4 py-1.5 rounded-full transition-all"
+                      >
+                        {t('gallery.edit_button')}
+                      </button>
+                    </div>
+                  )}
                 </div>
               </motion.div>
             );
