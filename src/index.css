@@ -1,0 +1,200 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", serif;
+  
+  --color-nordic-snow: var(--bg-primary, #f8f9fa);
+  --color-nordic-mist: var(--bg-secondary, #e9ecef);
+  --color-nordic-slate: var(--text-primary, #343a40);
+  --color-nordic-stone: var(--text-secondary, #6c757d);
+  --color-nordic-forest: var(--accent-primary, #2d3a3a);
+}
+
+.theme-night {
+  --bg-primary: #05070a;
+  --bg-secondary: #0d1117;
+  --text-primary: #f8f9fa;
+  --text-secondary: #cbd5e1;
+  --accent-primary: #60a5fa;
+  --blob-1: rgba(30, 58, 138, 0.4);
+  --blob-2: rgba(15, 23, 42, 0.4);
+  --glass-bg: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.15);
+}
+
+.theme-dawn {
+  --bg-primary: #fff7ed;
+  --bg-secondary: #ffedd5;
+  --text-primary: #431407;
+  --text-secondary: #7c2d12;
+  --accent-primary: #e11d48;
+  --blob-1: rgba(251, 113, 133, 0.2);
+  --blob-2: rgba(253, 186, 116, 0.2);
+  --glass-bg: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.4);
+}
+
+.theme-day {
+  --bg-primary: #f8f9fa;
+  --bg-secondary: #e9ecef;
+  --text-primary: #1a1f26;
+  --text-secondary: #4b5563;
+  --accent-primary: #2d3a3a;
+  --blob-1: rgba(59, 130, 246, 0.1);
+  --blob-2: rgba(16, 185, 129, 0.1);
+  --glass-bg: rgba(255, 255, 255, 0.4);
+  --glass-border: rgba(255, 255, 255, 0.4);
+}
+
+.theme-dusk {
+  --bg-primary: #1e1b4b;
+  --bg-secondary: #312e81;
+  --text-primary: #fefce8;
+  --text-secondary: #fde68a;
+  --accent-primary: #fbbf24;
+  --blob-1: rgba(120, 53, 15, 0.3);
+  --blob-2: rgba(67, 20, 7, 0.3);
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+}
+
+.theme-evening {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --accent-primary: #818cf8;
+  --blob-1: rgba(79, 70, 229, 0.2);
+  --blob-2: rgba(30, 58, 138, 0.2);
+  --glass-bg: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.15);
+}
+
+body {
+  @apply bg-nordic-snow text-nordic-slate font-sans antialiased overflow-x-hidden transition-colors duration-1000;
+}
+
+h1, h2, h3, h4 {
+  @apply font-serif transition-colors duration-1000;
+}
+
+.liquid-glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+}
+
+.liquid-glass-dark {
+  @apply bg-nordic-forest/40 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.2)];
+}
+
+.glass-card {
+  @apply bg-white/60 backdrop-blur-lg border border-white/30 shadow-sm transition-all duration-500;
+}
+
+.section-spacing {
+  @apply py-24 px-6 md:px-12 lg:px-24;
+}
+
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
+.animate-blob {
+  animation: blob 7s infinite alternate;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+.picture-frame {
+  @apply relative p-1 transition-all duration-500;
+  &::before {
+    content: '';
+    @apply absolute inset-0 rounded-[2.5rem] opacity-0 group-hover:opacity-100 transition-opacity duration-700 -z-10;
+    background: radial-gradient(circle at center, var(--accent-primary) 0%, transparent 70%);
+    filter: blur(30px);
+  }
+}
+
+.glass-frame, .glass-frame-dark, .glass-frame-accent {
+  position: relative;
+  overflow: hidden;
+  &::after {
+    content: '';
+    @apply absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent
+    );
+  }
+}
+.glass-frame {
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
+  @apply shadow-xl rounded-[2.5rem] p-5 transition-all duration-500;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.1),
+    inset 0 0 20px rgba(255, 255, 255, 0.05);
+}
+
+.glass-frame-dark {
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
+  @apply shadow-2xl rounded-[2.5rem] p-5 transition-all duration-500;
+  box-shadow: 
+    0 25px 50px rgba(0, 0, 0, 0.15),
+    inset 0 0 30px rgba(255, 255, 255, 0.02);
+}
+
+.glass-frame-accent {
+  background: var(--glass-bg);
+  backdrop-filter: blur(32px);
+  border: 1px solid var(--glass-border);
+  @apply shadow-lg rounded-[2.5rem] p-5 transition-all duration-500;
+  box-shadow: 
+    0 15px 30px rgba(0, 0, 0, 0.1),
+    inset 0 0 40px rgba(255, 255, 255, 0.1);
+}
+
+.plaque {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  @apply mt-4 px-6 py-2 rounded-full text-center shadow-sm transition-all duration-500 group-hover:shadow-md;
+}
+
+.plaque-text {
+  @apply font-sans text-nordic-slate text-[11px] font-bold uppercase tracking-[0.2em];
+}
+
+.gallery-wall {
+  @apply bg-nordic-snow relative overflow-hidden transition-colors duration-1000;
+  background-image: 
+    radial-gradient(circle at 0% 0%, var(--blob-1) 0%, transparent 50%),
+    radial-gradient(circle at 100% 100%, var(--blob-2) 0%, transparent 50%);
+}
+
+.spotlight {
+  @apply absolute pointer-events-none opacity-0;
+}
+
+.spotlight {
+  @apply absolute pointer-events-none;
+  background: radial-gradient(circle at center, rgba(255,255,220,0.15) 0%, transparent 70%);
+}
